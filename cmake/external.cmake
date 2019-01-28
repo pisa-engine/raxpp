@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 include(ExternalProject)
-set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external) 
+set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
 
 message(STATUS "ExternalProject_Add: rax")
 configure_file(cmake/rax.cmake.in "${CMAKE_BINARY_DIR}/rax-download/CMakeLists.txt")

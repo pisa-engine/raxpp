@@ -48,9 +48,8 @@ target_include_directories(
   raxpp
   INTERFACE $<BUILD_INTERFACE:${raxpp_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>)
-
 find_package(rax REQUIRED)
-target_link_libraries(raxpp INTERFACE rax)
+target_link_libraries(raxpp INTERFACE rax::rax)
 
 if (BUILD_TESTING AND RAXPP_BUILD_TESTING)
     enable_testing()
