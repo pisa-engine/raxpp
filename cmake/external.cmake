@@ -1,21 +1,43 @@
+cmake_minimum_required(VERSION 3.0)
+
 include(ExternalProject)
-set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
+set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external) 
 
-ExternalProject_Add(rax
-    GIT_REPOSITORY    "https://github.com/antirez/rax.git"
-    SOURCE_DIR        "${CMAKE_BINARY_DIR}/rax-src"
-    BINARY_DIR        "${CMAKE_BINARY_DIR}/rax-src"
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND     cc -c -fPIC -std=c99 rax.c -o librax.a
-    INSTALL_COMMAND   mkdir -p ${EXTERNAL_INSTALL_LOCATION}
-                        && cp librax.a ${EXTERNAL_INSTALL_LOCATION}/librax.a
-                        && cp rax.h ${EXTERNAL_INSTALL_LOCATION}/rax.h)
+message(STATUS "ExternalProject_Add: rax")
+configure_file(cmake/rax.cmake.in "${CMAKE_BINARY_DIR}/rax-download/CMakeLists.txt")
+execute_process(COMMAND ${CMAKE_COMMAND} .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/rax-download)
+if(result)
+  message(FATAL_ERROR "CMake step for rax failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/rax-download)
+execute_process(COMMAND cc -c -fPIC -std=c99 rax.c -o librax.a
+                COMMAND mkdir -p ${EXTERNAL_INSTALL_LOCATION}
+                COMMAND cp librax.a ${EXTERNAL_INSTALL_LOCATION}/librax.a
+                COMMAND cp rax.h ${EXTERNAL_INSTALL_LOCATION}/rax.h
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/rax-src)
+if(result)
+  message(FATAL_ERROR "Build step for rax failed: ${result}")
+endif()
 
-ExternalProject_Add(Catch
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    SOURCE_DIR        "${CMAKE_BINARY_DIR}/Catch2-src"
-    BINARY_DIR        "${CMAKE_BINARY_DIR}/Catch2-src"
-    CMAKE_ARGS -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION})
+message(STATUS "ExternalProject_Add: Catch2")
+configure_file(cmake/catch2.cmake.in "${CMAKE_BINARY_DIR}/catch2-download/CMakeLists.txt")
+execute_process(COMMAND ${CMAKE_COMMAND} .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/catch2-download)
+if(result)
+  message(FATAL_ERROR "CMake step for rax failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/catch2-download)
+if(result)
+  message(FATAL_ERROR "Build step for rax failed: ${result}")
+endif()
 
 list(APPEND CMAKE_MODULE_PATH ${EXTERNAL_INSTALL_LOCATION})
 list(APPEND CMAKE_PREFIX_PATH ${EXTERNAL_INSTALL_LOCATION})

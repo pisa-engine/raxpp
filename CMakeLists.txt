@@ -20,6 +20,15 @@ set(RAXPP_CMAKE_PROJECT_CONFIG_FILE
 set(RAXPP_CMAKE_PROJECT_TARGETS_FILE
     "${RAXPP_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Targets.cmake")
 
+if (UNIX)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-missing-braces")
+   if (USE_SANITIZERS)
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+   endif ()
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb") # Add debug info anyway
+endif()
+
 #
 # OPTIONS
 #
@@ -47,3 +56,29 @@ if (BUILD_TESTING AND RAXPP_BUILD_TESTING)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+#
+# INSTALL install header files, generate and install cmake config files for
+# find_package()
+#
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(${RAXPP_CMAKE_VERSION_CONFIG_FILE}
+                                 COMPATIBILITY SameMajorVersion)
+configure_file(${RAXPP_CMAKE_CONFIG_TEMPLATE} ${RAXPP_CMAKE_PROJECT_CONFIG_FILE}
+               @ONLY)
+
+install(DIRECTORY ${RAXPP_INCLUDE_BUILD_DIR}
+        DESTINATION ${RAXPP_INCLUDE_INSTALL_DIR})
+install(FILES ${RAXPP_CMAKE_PROJECT_CONFIG_FILE}
+              ${RAXPP_CMAKE_VERSION_CONFIG_FILE}
+        DESTINATION ${RAXPP_CONFIG_INSTALL_DIR})
+export(TARGETS ${RAXPP_TARGET_NAME}
+       NAMESPACE ${PROJECT_NAME}::
+       FILE ${RAXPP_CMAKE_PROJECT_TARGETS_FILE})
+install(TARGETS ${RAXPP_TARGET_NAME}
+        EXPORT ${RAXPP_TARGETS_EXPORT_NAME}
+        INCLUDES
+        DESTINATION ${RAXPP_INCLUDE_INSTALL_DIR})
+install(EXPORT ${RAXPP_TARGETS_EXPORT_NAME}
+        NAMESPACE ${PROJECT_NAME}::
+        DESTINATION ${RAXPP_CONFIG_INSTALL_DIR})

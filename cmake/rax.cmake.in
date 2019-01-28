@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 2.8.2)
+
+project(rax-download NONE)
+
+include(ExternalProject)
+ExternalProject_Add(rax
+    GIT_REPOSITORY    "https://github.com/antirez/rax.git"
+    SOURCE_DIR        "${CMAKE_BINARY_DIR}/rax-src"
+    BINARY_DIR        "${CMAKE_BINARY_DIR}/rax-build"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND     ""
+    INSTALL_COMMAND   ""
+)
