@@ -15,14 +15,15 @@ execute_process(COMMAND ${CMAKE_COMMAND} --build .
   RESULT_VARIABLE result
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/rax-download)
 execute_process(COMMAND cc -c -fPIC -std=c99 rax.c -o librax.a
-                COMMAND mkdir -p ${EXTERNAL_INSTALL_LOCATION}
-                COMMAND cp librax.a ${EXTERNAL_INSTALL_LOCATION}/librax.a
-                COMMAND cp rax.h ${EXTERNAL_INSTALL_LOCATION}/rax.h
   RESULT_VARIABLE result
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/rax-src)
 if(result)
   message(FATAL_ERROR "Build step for rax failed: ${result}")
 endif()
+execute_process(COMMAND mkdir -p ${EXTERNAL_INSTALL_LOCATION}
+                COMMAND cp librax.a ${EXTERNAL_INSTALL_LOCATION}/librax.a
+                COMMAND cp rax.h ${EXTERNAL_INSTALL_LOCATION}/rax.h
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/rax-src)
 
 message(STATUS "ExternalProject_Add: Catch2")
 configure_file(cmake/catch2.cmake.in "${CMAKE_BINARY_DIR}/catch2-download/CMakeLists.txt")
